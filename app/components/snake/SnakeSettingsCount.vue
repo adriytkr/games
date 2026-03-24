@@ -1,6 +1,11 @@
 <script setup lang="ts" generic="T">
-defineProps<{
+const {
+  disableLeft=false,
+  disableRight=false,
+}=defineProps<{
   value:T;
+  disableLeft?:boolean;
+  disableRight?:boolean;
 }>();
 
 defineEmits<{
@@ -11,9 +16,21 @@ defineEmits<{
 
 <template>
   <div class="count-wrapper">
-    <button class="btn is-decrement" @click="$emit('left')">-</button>
+    <button
+      class="btn is-decrement"
+      @click="$emit('left')"
+      :disabled="disableLeft"
+    >
+      -
+  </button>
     <div class="count">{{ value }}</div>
-    <button class="btn is-increment" @click="$emit('right')">+</button>
+    <button
+      class="btn is-increment"
+      @click="$emit('right')"
+      :disabled="disableRight"
+    >
+      +
+  </button>
   </div>
 </template>
 
@@ -41,6 +58,19 @@ defineEmits<{
 
 .btn:active{
   transform:scale(0.9);
+}
+
+.btn:disabled{
+  opacity:0.2;
+  cursor:not-allowed;
+  filter:grayscale(1);
+  pointer-events:none;
+}
+
+.btn:disabled:hover,
+.btn:disabled:active{
+  transform:none;
+  background-color:inherit;
 }
 
 .is-decrement{

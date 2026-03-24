@@ -21,7 +21,7 @@ const gridSize=useCount({
 });
 
 const speedOrder:GameSpeed[]=['slow','normal','fast']
-const speed=useCycle<GameSpeed>(speedOrder,0,{cyclic:false});
+const speed=useCycle<GameSpeed>(speedOrder,0,{cyclic:true});
 const speedMap:Record<GameSpeed,string>={
   slow:'Slow',
   normal:'Normal',
@@ -30,7 +30,7 @@ const speedMap:Record<GameSpeed,string>={
 const speedLabel=computed(()=>speedMap[speed.state.value]);
 
 type ToggleState='off'|'on';
-const showGrid=useCycle<ToggleState>(['off','on'],0,{cyclic:false});
+const showGrid=useCycle<ToggleState>(['off','on'],0,{cyclic:true});
 const labelMap:Record<ToggleState,string>={
   'off':'Off',
   'on':'On',
@@ -61,6 +61,8 @@ function play(){
             @left="gridSize.decrement"
             @right="gridSize.increment"
             :value="gridSize.count.value"
+            :disable-left="gridSize.count.value<=7"
+            :disable-right="gridSize.count.value>=13"
           />
         </SnakeSettingsOption>
         <SnakeSettingsOption label="Number of apples">
@@ -68,6 +70,8 @@ function play(){
             @left="appleCount.decrement"
             @right="appleCount.increment"
             :value="appleCount.count.value"
+            :disable-left="appleCount.count.value<=1"
+            :disable-right="appleCount.count.value>=3"
           />
         </SnakeSettingsOption>
         <SnakeSettingsOption label="Show grid">

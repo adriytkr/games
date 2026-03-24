@@ -12,6 +12,8 @@ const DEFAULT_GAME_CONFIG:ISnakeGameConfig={
     height:7,
   },
   appleCount:1,
+  showGrid:true,
+  speed:'normal',
 };
 
 const gameConfig=ref<ISnakeGameConfig>({...DEFAULT_GAME_CONFIG});

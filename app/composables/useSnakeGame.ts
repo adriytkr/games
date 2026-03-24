@@ -1,4 +1,4 @@
-import type { IVector2 } from '~/types/';
+import type { ISize, IVector2 } from '~/types/';
 import type { GameSpeed, GameState, IGameAPI, ISnakeGameConfig, Movement } from '~/types/snake-game';
 
 export function useSnakeGame(
@@ -8,11 +8,14 @@ export function useSnakeGame(
   const getMiddleY=()=>Math.floor(config.gridSize.height/2);
   const getLastX=()=>config.gridSize.width-1;
 
-  const generateInitialSnake=():IVector2[]=>[
-    {x:1,y:getMiddleY()},
-    {x:2,y:getMiddleY()},
-    {x:3,y:getMiddleY()},
-  ];
+  const generateInitialSnake=()=>generatePositions(
+    {
+      x:1,
+      y:getMiddleY(),
+    },
+    {x:1,y:0},
+    3,
+  );
 
   const INITIAL_SPEED:IVector2={
     x:1,
@@ -38,11 +41,6 @@ export function useSnakeGame(
   let snake:IVector2[]=[];
   let apples:IVector2[]=[];
   let speed:IVector2={...INITIAL_SPEED};
-
-  function isPositionOccupied(pos:IVector2):boolean{
-    return snake.some(segment=>samePosition(segment,pos))||
-      apples.some(apple=>samePosition(apple,pos));
-  }
 
   const score=ref<number>(0);
   let begin=ref<boolean>(false);
@@ -161,26 +159,11 @@ export function useSnakeGame(
     spawnApple();
   };
 
-  const appleCount=1;
-  const gridSize=config.gridSize.width*config.gridSize.height;
+  const totalCells=config.gridSize.width*config.gridSize.height;
 
-  const checkWinning=():boolean=>
-    snake.length+appleCount===gridSize;
-
-  const checkSelfCollision=(head:IVector2):boolean=>{
-    for(let i=0;i<snake.length-1;i++){
-      if(samePosition(snake[i]!,head))return true;
-    }
-
-    return false;
-  }
-
-  const checkWallCollision=(head:IVector2):boolean=>
-    !isInInterval(0,config.gridSize.width-1,head.x)||
-    !isInInterval(0,config.gridSize.height-1,head.y);
-
-  const gameOver=()=>{
+  const gameOver=(reason:string)=>{
     gameState.value='GAME-OVER';
+    error.value=reason;
     cancelLoop();
   };
 
@@ -204,15 +187,13 @@ export function useSnakeGame(
 
     const newHead=addVec(getSnakeHead(),speed);
 
-    if(checkSelfCollision(newHead)){
-      gameOver();
-      error.value='You self collided';
+    if(checkCollision(newHead,snake)!==null){
+      gameOver('You self collided');
       return;
     }
 
-    if(checkWallCollision(newHead)){
-      gameOver();
-      error.value='You hit a wall';
+    if(checkBounds(newHead,config.gridSize)){
+      gameOver('You hit a wall');
       return;
     }
 
@@ -220,7 +201,8 @@ export function useSnakeGame(
     if(eatenApple!==null){
       eatApple(newHead,eatenApple);
 
-      if(checkWinning())gameState.value='WIN';
+      if(checkWinning(snake.length,apples.length,totalCells))
+        gameState.value='WIN';
     }
     else updateSnake(newHead);
 
@@ -248,51 +230,17 @@ export function useSnakeGame(
     loopId=requestAnimationFrame(loop);
   };
 
-  const isUp=(key:string):boolean=>
-    key==='ArrowUp'||key==='w';
-
-  const isLeft=(key:string):boolean=>
-    key==='ArrowLeft'||key==='a';
-
-  const isDown=(key:string):boolean=>
-    key==='ArrowDown'||key==='s';
-
-  const isRight=(key:string):boolean=>
-    key==='ArrowRight'||key==='d';
-
-  const convert=(event:KeyboardEvent):Movement|null=>{
-    const key=event.key;
-
-    if(isUp(key))return 'up';
-    if(isLeft(key))return 'left';
-    if(isRight(key))return 'right';
-    if(isDown(key))return 'down';
-
-    return null;
-  };
-
-  const KEY_MAP:Record<Movement,IVector2>={
-    'up':{x:0,y:-1},
-    'left':{x:-1,y:0},
-    'down':{x:0,y:1},
-    'right':{x:1,y:0},
-  };
-
   let lastDirection:Movement='right';
-  const isOppositeDirection=(directionA:Movement,directionB:Movement):boolean=>{
-    const speedA=KEY_MAP[directionA];
-    const speedB=KEY_MAP[directionB];
-
-    return (speedA.x+speedB.x===0)&&(speedA.y+speedB.y===0);
-  };
 
   const handleKeyDown=(event:KeyboardEvent)=>{
     if(gameState.value!=='PLAY')return;
 
     const newDirection=convert(event);
 
-    if(newDirection===null)return;
-    if(isOppositeDirection(newDirection,lastDirection))return;
+    if(
+      newDirection===null||
+      isDirectionOpposite(lastDirection,newDirection)
+    )return;
 
     if(!begin.value)begin.value=true;
     lastDirection=newDirection;
@@ -319,6 +267,7 @@ export function useSnakeGame(
 
   const detachListeners=()=>{
     window.removeEventListener('keydown',handleKeyDown);
+    cancelLoop();
   };
 
   const error=ref<string>('');
