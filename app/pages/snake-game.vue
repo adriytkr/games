@@ -6,12 +6,25 @@ import type {
 
 const {state:currentScene}=useGameState<GameScene>('MENU');
 
-const gameConfig=ref<ISnakeGameConfig>({
+const DEFAULT_GAME_CONFIG:ISnakeGameConfig={
   gridSize:{
-    width:11,
-    height:11,
+    width:7,
+    height:7,
   },
-});
+  appleCount:1,
+};
+
+const gameConfig=ref<ISnakeGameConfig>({...DEFAULT_GAME_CONFIG});
+
+function play(settings:ISnakeGameConfig){
+  currentScene.value='PLAY';
+  gameConfig.value=settings;
+}
+
+const router=useRouter();
+function exit(){
+  router.push('/');
+}
 </script>
 
 <template>
@@ -20,11 +33,12 @@ const gameConfig=ref<ISnakeGameConfig>({
       v-if="currentScene==='MENU'"
       @play="currentScene='SETTINGS'"
       @tutorial="currentScene='TUTORIAL'"
+      @exit="exit"
     />
     <SnakeSettingsScene
       v-else-if="currentScene==='SETTINGS'"
       @back="currentScene='MENU'"
-      @play="currentScene='PLAY'"
+      @play="play"
     />
     <SnakeTutorialScene
       v-else-if="currentScene==='TUTORIAL'"
@@ -42,5 +56,7 @@ const gameConfig=ref<ISnakeGameConfig>({
 .game{
   height:100vh;
   width:100vw;
+  background-color:#000;
+  color:#fff;
 }
 </style>

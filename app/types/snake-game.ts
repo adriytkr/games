@@ -13,6 +13,7 @@ export type GameState=
 
 export interface ISnakeGameConfig{
   gridSize:ISize;
+  appleCount:number;
 }
 
 export type Movement=
@@ -28,4 +29,6 @@ export interface IGameAPI{
   gameState:Ref<GameState>,
   reset:()=>void,
   score:Ref<number>,
+  error:Ref<string>,
+  begin:Ref<boolean>,
 };

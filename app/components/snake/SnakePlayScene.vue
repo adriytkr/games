@@ -32,22 +32,25 @@ const emit = defineEmits<{
 <template>
   <TheScene>
     <div class="game-content">
-      <div class="game-hud" v-if="engine">
-        <span class="game-score">{{ engine.score }}</span>
-      </div>
+      <SnakeGameHud
+        v-if="engine"
+        :score="engine.score.value"
+      />
       <div class="game-main">
         <canvas id="canvas" ref="canvasRef"></canvas>
         <div class="overlay" v-if="engine">
-          <div class="gameOver" v-if="engine.gameState.value==='GAME-OVER'">
-            <h1>You lost</h1>
-            <SnakeButton @click="engine.reset">Try Again</SnakeButton>
-            <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
-          </div>
-          <div class="gameOver" v-else-if="engine.gameState.value==='WIN'">
-            <h1>You won</h1>
-            <SnakeButton @click="">Play Again</SnakeButton>
-            <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
-          </div>
+          <SnakeGameBeginScreen v-if="!engine.begin.value"/>
+          <SnakeGameOverScreen
+            v-if="engine.gameState.value==='GAME-OVER'"
+            :error="engine.error.value"
+            @retry="engine.reset"
+            @menu="$emit('menu')"
+          />
+          <SnakeWinningScreen
+            v-else-if="engine.gameState.value==='WIN'"
+            @play-again="engine.reset"
+            @menu="$emit('menu')"
+          />
         </div>
       </div>
     </div>
@@ -56,20 +59,12 @@ const emit = defineEmits<{
 
 <style scoped>
 #canvas{
-  width:500px;
-  height:500px;
+  width:700px;
+  height:700px;
   background-color:#000;
 }
 
 .game-main{
   position:relative;
-}
-
-.overlay{
-  width:100%;
-  height:100%;
-  position:absolute;
-  left:0;
-  top:0;
 }
 </style>

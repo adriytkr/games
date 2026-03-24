@@ -6,11 +6,25 @@
 
 <style scoped>
 .btn{
-  background-color:#000;
-  padding:8px 16px;
+  background-color:#fff;
+  padding:16px 24px;
+  border-radius:6px;
   border:none;
-  font-weight:600;
-  color:#fff;
+  font-weight:700;
+  font-size:26px;
+  text-transform:uppercase;
+  color:#000;
   cursor:pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+}
+
+.btn:hover{
+  background-color:#4CAF50;
+}
+
+.btn:active{
+  transform:scale(0.9);
 }
 </style>

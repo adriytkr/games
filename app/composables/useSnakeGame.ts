@@ -131,16 +131,17 @@ export function useSnakeGame(
     !isInInterval(0,config.gridSize.width-1,head.x)||
     !isInInterval(0,config.gridSize.height-1,head.y);
 
-  const checkGameOver=(head:IVector2):boolean=>
-    checkSelfCollision(head)||
-    checkWallCollision(head);
+  const gameOver=()=>{
+    gameState.value='GAME-OVER';
+    cancelLoop();
+  };
 
   let lastTime=0;
   const tickRate=50;
   const loop=(timestamp:number)=>{
     const delta=timestamp-lastTime;
 
-    requestAnimationFrame(loop);
+    loopId=requestAnimationFrame(loop);
 
     if(!begin.value)return;
     if(delta<tickRate)return;
@@ -149,8 +150,15 @@ export function useSnakeGame(
 
     const newHead=addVec(getSnakeHead(),speed);
 
-    if(checkGameOver(newHead)){
-      gameState.value='GAME-OVER';
+    if(checkSelfCollision(newHead)){
+      gameOver();
+      error.value='You self collided';
+      return;
+    }
+
+    if(checkWallCollision(newHead)){
+      gameOver();
+      error.value='You hit a wall';
       return;
     }
 
@@ -171,11 +179,16 @@ export function useSnakeGame(
     cellSize=canvas.width/config.gridSize.width;
   }
 
+  const cancelLoop=()=>{
+    cancelAnimationFrame(loopId);
+  };
+
+  let loopId:number;
   const start=()=>{
     initCanvas();
     draw();
 
-    requestAnimationFrame(loop);
+    loopId=requestAnimationFrame(loop);
   };
 
   const isUp=(key:string):boolean=>
@@ -208,14 +221,26 @@ export function useSnakeGame(
     'right':{x:1,y:0},
   };
 
-  const handleKeyDown=(event:KeyboardEvent)=>{
-    const movement=convert(event);
+  let lastDirection:Movement='right';
+  const isOppositeDirection=(directionA:Movement,directionB:Movement):boolean=>{
+    const speedA=KEY_MAP[directionA];
+    const speedB=KEY_MAP[directionB];
 
-    if(movement===null)return;
+    return (speedA.x+speedB.x===0)&&(speedA.y+speedB.y===0);
+  };
+
+  const handleKeyDown=(event:KeyboardEvent)=>{
+    if(gameState.value!=='PLAY')return;
+
+    const newDirection=convert(event);
+
+    if(newDirection===null)return;
+    if(isOppositeDirection(newDirection,lastDirection))return;
 
     if(!begin.value)begin.value=true;
+    lastDirection=newDirection;
 
-    speed=KEY_MAP[movement];
+    speed=KEY_MAP[newDirection];
   };
 
   const reset=()=>{
@@ -224,9 +249,11 @@ export function useSnakeGame(
     speed={...INITIAL_SPEED}
     begin.value=false;
     score.value=0;
+    lastDirection='right';
     clear();
     draw();
     gameState.value='PLAY';
+    requestAnimationFrame(loop);
   };
 
   const attachListeners=()=>{
@@ -237,6 +264,8 @@ export function useSnakeGame(
     window.removeEventListener('keydown',handleKeyDown);
   };
 
+  const error=ref<string>('');
+
   return{
     start,
     attachListeners,
@@ -244,5 +273,7 @@ export function useSnakeGame(
     reset,
     gameState,
     score,
+    error,
+    begin,
   };
 }
