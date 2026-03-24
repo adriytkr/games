@@ -5,72 +5,19 @@ export function useSnakeGame(
   canvas:HTMLCanvasElement,
   config:ISnakeGameConfig,
 ):IGameAPI{
-  const getMiddleY=()=>Math.floor(config.gridSize.height/2);
-  const getLastX=()=>config.gridSize.width-1;
-
   const renderer=new SnakeRenderer(canvas);
-
-  const generateInitialSnake=()=>generatePositions(
-    {
-      x:1,
-      y:getMiddleY(),
-    },
-    {x:1,y:0},
-    3,
-  );
 
   const INITIAL_SPEED:IVector2={x:1,y:0};
 
-  const generateInitialApples=():IVector2[]=>{
-    const defaultApple:IVector2={
-      x:getLastX()-1,
-      y:getMiddleY(),
-    };
-    const initialApples:IVector2[]=[defaultApple];
+  const engine=new SnakeEngine(config.gridSize,config.appleCount);
+  let velocity:IVector2={...INITIAL_SPEED};
 
-    for(let i=0;i<config.appleCount-1;i++){
-      const randomApple=getNewFreePosition(config.gridSize,snake,apples);
-      if(randomApple===null)return initialApples;
-      initialApples.push(randomApple);
-    }
-
-    return initialApples;
-  };
-
-  let snake:IVector2[]=[];
-  let apples:IVector2[]=[];
-  let speed:IVector2={...INITIAL_SPEED};
-
-  const score=ref<number>(0);
   let begin=ref<boolean>(false);
   const {state:gameState}=useGameState<GameState>('PLAY');
 
   const updateSnake=(head:IVector2)=>{
-    snake.push(head);
-    snake.shift();
-  };
-
-  const getSnakeHead=():IVector2=>
-    snake[snake.length-1]!;
-
-
-  const spawnApple=()=>{
-    const randomPosition=getNewFreePosition(config.gridSize,snake,apples);
-
-    if(randomPosition===null)
-      throw Error('Could not spawn new apple');
-
-    apples.push(randomPosition);
-  };
-
-  const eatApple=(head:IVector2,eatenApple:IVector2)=>{
-    score.value++;
-    snake.push(head);
-
-    const index=apples.findIndex(apple=>apple===eatenApple);
-    if(index!==-1)apples.splice(index,1);
-
-    spawnApple();
+    engine.snake.push(head);
+    engine.snake.shift();
   };
 
   const totalCells=config.gridSize.width*config.gridSize.height;
@@ -89,6 +36,17 @@ export function useSnakeGame(
   };
   const speedFactor=factorMap[config.speed];
   const tickRate=100*speedFactor;
+
+  engine.onEat=(newScore:number)=>{
+
+  };
+
+  engine.onGameOver=(reason:string)=>{};
+
+  engine.onWin=()=>{
+
+  };
+
   const loop=(timestamp:number)=>{
     const delta=timestamp-lastTime;
 
@@ -99,9 +57,12 @@ export function useSnakeGame(
 
     lastTime=timestamp;
 
-    const newHead=addVec(getSnakeHead(),speed);
 
-    if(checkCollision(newHead,snake)!==null){
+    const newHead=addVec(engine.snakeHead,velocity);
+
+    engine.step(velocity);
+
+    if(checkCollision(newHead,engine.snake)!==null){
       gameOver('You self collided');
       return;
     }
@@ -111,18 +72,19 @@ export function useSnakeGame(
       return;
     }
 
-    let eatenApple:IVector2|null=checkCollision(newHead,apples);
+    let eatenApple:IVector2|null=checkCollision(newHead,engine.apples);
     if(eatenApple!==null){
-      eatApple(newHead,eatenApple);
+      engine.eatApple(newHead,eatenApple);
+      score.value=engine.score;
 
-      if(checkWinning(snake.length,apples.length,totalCells))
+      if(checkWinning(engine.snake.length,engine.apples.length,totalCells))
         gameState.value='WIN';
     }
     else updateSnake(newHead);
 
     renderer.render(
-      snake,
-      apples,
+      engine.snake,
+      engine.apples,
       config.gridSize,
       config.showGrid,
     );
@@ -134,12 +96,12 @@ export function useSnakeGame(
 
   let loopId:number;
   const start=()=>{
+    engine.bootstrap();
     renderer.syncSize(config.gridSize);
-    snake=generateInitialSnake();
-    apples=generateInitialApples();
+
     renderer.render(
-      snake,
-      apples,
+      engine.snake,
+      engine.apples,
       config.gridSize,
       config.showGrid,
     );
@@ -162,21 +124,19 @@ export function useSnakeGame(
     if(!begin.value)begin.value=true;
     lastDirection=newDirection;
 
-    speed=KEY_MAP[newDirection];
+    velocity=KEY_MAP[newDirection];
   };
 
   const reset=()=>{
-    snake=generateInitialSnake();
-    apples=generateInitialApples();
-    speed={...INITIAL_SPEED};
+    engine.bootstrap();
+    velocity={...INITIAL_SPEED};
 
     begin.value=false;
-    score.value=0;
     lastDirection='right';
 
     renderer.render(
-      snake,
-      apples,
+      engine.snake,
+      engine.apples,
       config.gridSize,
       config.showGrid,
     );
@@ -195,6 +155,7 @@ export function useSnakeGame(
   };
 
   const error=ref<string>('');
+  const score=ref<number>(0);
 
   return{
     start,
