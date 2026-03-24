@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 defineProps<{
-  value:number;
+  value:T;
 }>();
 
 defineEmits<{
@@ -58,6 +58,7 @@ defineEmits<{
   border-radius:8px;
   font-weight:600;
   color:#000;
+  text-transform:uppercase;
   display:flex;
   justify-content:center;
   align-items:center;

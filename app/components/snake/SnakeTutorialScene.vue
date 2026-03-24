@@ -15,10 +15,16 @@ defineEmits<{
         <SnakeButton @click="$emit('back')">Back</SnakeButton>
       </div>
     </div>
+    <SnakeGrid/>
   </TheScene>
 </template>
 
 <style scoped>
+.tutorial-content{
+  position:relative;
+  z-index:10;
+}
+
 .tutorial-main{
   margin-bottom:24px;
 }

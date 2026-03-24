@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ISnakeGameConfig } from '~/types/snake-game';
+import type { ISnakeGameConfig,GameSpeed } from '~/types/snake-game';
 
 const emit=defineEmits<{
   (e:'back'):void;
@@ -20,6 +20,23 @@ const gridSize=useCount({
   step:2,
 });
 
+const speedOrder:GameSpeed[]=['slow','normal','fast']
+const speed=useCycle<GameSpeed>(speedOrder,0,{cyclic:false});
+const speedMap:Record<GameSpeed,string>={
+  slow:'Slow',
+  normal:'Normal',
+  fast:'Fast',
+};
+const speedLabel=computed(()=>speedMap[speed.state.value]);
+
+type ToggleState='off'|'on';
+const showGrid=useCycle<ToggleState>(['off','on'],0,{cyclic:false});
+const labelMap:Record<ToggleState,string>={
+  'off':'Off',
+  'on':'On',
+};
+const showGridLabel=computed(()=>labelMap[showGrid.state.value]);
+
 function play(){
   const settings:ISnakeGameConfig={
     gridSize:{
@@ -27,6 +44,8 @@ function play(){
       height:gridSize.count.value,
     },
     appleCount:appleCount.count.value,
+    showGrid:showGrid.state.value==='on',
+    speed:speed.state.value,
   };
 
   emit('play',settings);
@@ -51,16 +70,36 @@ function play(){
             :value="appleCount.count.value"
           />
         </SnakeSettingsOption>
+        <SnakeSettingsOption label="Show grid">
+          <SnakeSettingsCount
+            @left="showGrid.decrease"
+            @right="showGrid.increase"
+            :value="showGridLabel"
+          />
+        </SnakeSettingsOption>
+        <SnakeSettingsOption label="Speed">
+          <SnakeSettingsCount
+            @left="speed.decrease"
+            @right="speed.increase"
+            :value="speedLabel"
+          />
+        </SnakeSettingsOption>
       </div>
       <div class="settings-actions">
         <SnakeButton @click="$emit('back')">Back</SnakeButton>
         <SnakeButton @click="play">Start</SnakeButton>
       </div>
     </div>
+    <SnakeGrid/>
   </TheScene>
 </template>
 
 <style scoped>
+.settings-content{
+  position:relative;
+  z-index:10;
+}
+
 .settings-options{
   min-width:500px;
   margin-bottom:24px;

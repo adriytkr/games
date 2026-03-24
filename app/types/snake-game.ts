@@ -11,9 +11,13 @@ export type GameState=
   'GAME-OVER'|
   'WIN';
 
+export type GameSpeed='slow'|'normal'|'fast';
+
 export interface ISnakeGameConfig{
   gridSize:ISize;
   appleCount:number;
+  showGrid:boolean;
+  speed:GameSpeed;
 }
 
 export type Movement=

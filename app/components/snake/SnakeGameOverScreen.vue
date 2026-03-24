@@ -11,16 +11,33 @@ defineProps<{
 
 <template>
   <SnakeGameOverlay>
-    <div class="gameOver">
-      <h1 class="gameOver-title">You lost</h1>
-      <p class="gameOver-description">{{ error }}</p>
-      <SnakeButton @click="$emit('retry')">Try Again</SnakeButton>
-      <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
+    <div class="gameOver-wrapper">
+      <div class="gameOver">
+        <h1 class="gameOver-title">You lost</h1>
+        <p class="gameOver-description">{{ error }}</p>
+        <div class="actions">
+          <SnakeButton @click="$emit('retry')">Try Again</SnakeButton>
+          <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
+        </div>
+      </div>
     </div>
   </SnakeGameOverlay>
 </template>
 
 <style scoped>
+.gameOver-wrapper{
+  width:100%;
+  height:100%;
+  background-color:rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+  position:absolute;
+  left:0;
+  top:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
 .gameOver{
   text-align:center;
 }
@@ -36,5 +53,11 @@ defineProps<{
 
 .gameOver-description{
   margin-bottom:16px;
+}
+
+.actions {
+  display:flex;
+  column-gap:20px;
+  justify-content:center;
 }
 </style>
