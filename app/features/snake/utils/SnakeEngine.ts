@@ -1,4 +1,5 @@
 import type { ISize, IVector2 } from '~/types';
+import { checkWinning } from './snake';
 
 export class SnakeEngine{
   private m_snake:IVector2[]=[];

@@ -5,7 +5,7 @@ defineEmits<{
 </script>
 
 <template>
-  <TheScene>
+  <BaseScene>
     <div class="tutorial-content">
       <div class="tutorial-main">
         <h1 class="tutorial-title">Under development...</h1>
@@ -16,7 +16,7 @@ defineEmits<{
       </div>
     </div>
     <SnakeGrid/>
-  </TheScene>
+  </BaseScene>
 </template>
 
 <style scoped>

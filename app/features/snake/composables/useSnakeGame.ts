@@ -3,7 +3,10 @@ import type {
   IGameAPI,
   ISnakeGameConfig,
   Direction,
-} from '~/types/snake-game';
+} from '~/features/snake/types/snake-game';
+import { SnakeRenderer } from '../utils/SnakeRenderer';
+import { SnakeEngine } from '../utils/SnakeEngine';
+import { convert, getTickRate, isDirectionOpposite, KEY_MAP } from '../utils/snake';
 
 export function useSnakeGame(
   canvas:HTMLCanvasElement,

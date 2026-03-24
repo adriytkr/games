@@ -7,7 +7,7 @@ defineEmits<{
 </script>
 
 <template>
-  <TheScene>
+  <BaseScene>
     <SnakeGrid></SnakeGrid>
     <div class="menu-content">
       <div class="menu-title">Snake Game</div>
@@ -17,7 +17,7 @@ defineEmits<{
         <SnakeBaseButton @click="$emit('exit')">Exit</SnakeBaseButton>
       </div>
     </div>
-  </TheScene>
+  </BaseScene>
 </template>
 
 <style scoped>

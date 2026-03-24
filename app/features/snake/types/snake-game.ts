@@ -1,4 +1,4 @@
-import type { ISize } from './math';
+import type { ISize } from '../../../types/math';
 
 export type GameScene=
   'MENU'|

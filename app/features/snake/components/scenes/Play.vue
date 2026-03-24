@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { IGameAPI, ISnakeGameConfig } from '~/types/snake-game';
+import type { IGameAPI, ISnakeGameConfig } from '~/features/snake/types/snake-game';
+import { useSnakeGame } from '../../composables/useSnakeGame';
 
 const props=defineProps<{
   config:ISnakeGameConfig;
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <TheScene>
+  <BaseScene>
     <div class="game-content">
       <SnakeGameHud
         v-if="engine"
@@ -54,7 +55,7 @@ const emit = defineEmits<{
         </div>
       </div>
     </div>
-  </TheScene>
+  </BaseScene>
 </template>
 
 <style scoped>

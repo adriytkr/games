@@ -1,5 +1,5 @@
 import type { IVector2 } from '~/types';
-import type { GameSpeed, Direction } from '~/types/snake-game';
+import type { GameSpeed, Direction } from '~/features/snake/types/snake-game';
 
 export const checkWinning=(
   snakeLength:number,

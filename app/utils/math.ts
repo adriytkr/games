@@ -1,12 +1,17 @@
 import type { ISize, IVector2 } from '~/types';
 
-export const checkSamePosition=(posA:IVector2,posB:IVector2):boolean=>
-  posA.x===posB.x&&posA.y===posB.y;
-
 export const addVec=(posA:IVector2,posB:IVector2):IVector2=>({
   x:posA.x+posB.x,
   y:posA.y+posB.y,
 });
+
+export const multVec=(vector:IVector2,scalar:number):IVector2=>({
+  x:vector.x*scalar,
+  y:vector.y*scalar,
+});
+
+export const checkSamePosition=(posA:IVector2,posB:IVector2):boolean=>
+  posA.x===posB.x&&posA.y===posB.y;
 
 export const checkCollision=(subject:IVector2,target:IVector2[]):IVector2|null=>
   target.find(pos=>checkSamePosition(subject,pos))||null;
@@ -45,11 +50,6 @@ export function getNewFreePosition(gridSize:ISize,...targets:IVector2[][]):IVect
 export const checkBounds=(pos:IVector2,bounds:ISize):boolean=>
   !isInInterval(0,bounds.width-1,pos.x)||
   !isInInterval(0,bounds.height-1,pos.y);
-
-export const multVec=(vector:IVector2,scalar:number):IVector2=>({
-  x:vector.x*scalar,
-  y:vector.y*scalar,
-});
 
 export const generatePositions=(
   initialPosition:IVector2,

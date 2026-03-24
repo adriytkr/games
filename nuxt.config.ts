@@ -6,4 +6,14 @@ export default defineNuxtConfig({
   css:[
     '~/assets/styles/main.css',
   ],
+  components:[
+    {
+      path:'~/components',
+    },
+    {
+      path:'~/features/snake/components',
+      prefix:'Snake',
+      pathPrefix:true,
+    }
+  ],
 })

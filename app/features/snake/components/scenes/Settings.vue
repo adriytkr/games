@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ISnakeGameConfig,GameSpeed } from '~/types/snake-game';
+import type { ISnakeGameConfig,GameSpeed } from '~/features/snake/types/snake-game';
 
 const emit=defineEmits<{
   (e:'back'):void;
@@ -53,7 +53,7 @@ function play(){
 </script>
 
 <template>
-  <TheScene>
+  <BaseScene>
     <div class="settings-content">
       <div class="settings-options">
         <SnakeSettingsOption label="Grid Size">
@@ -95,7 +95,7 @@ function play(){
       </div>
     </div>
     <SnakeGrid/>
-  </TheScene>
+  </BaseScene>
 </template>
 
 <style scoped>

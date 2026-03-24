@@ -2,9 +2,9 @@
 import type {
   GameScene,
   ISnakeGameConfig,
-} from '~/types/snake-game';
+} from '~/features/snake/types/snake-game';
 
-const {state:currentScene}=useGameState<GameScene>('MENU');
+const currentScene=ref<GameScene>('MENU');
 
 const DEFAULT_GAME_CONFIG:ISnakeGameConfig={
   gridSize:{
