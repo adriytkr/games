@@ -15,6 +15,8 @@
   text-transform:uppercase;
   color:#000;
   cursor:pointer;
+  font-family:'Fira Code';
+  letter-spacing:6px;
   transition:
     background-color 0.2s,
     transform 0.1s;

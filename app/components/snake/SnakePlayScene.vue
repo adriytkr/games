@@ -62,6 +62,7 @@ const emit = defineEmits<{
   width:700px;
   height:700px;
   background-color:#000;
+  border:1px solid #fff;
 }
 
 .game-main{

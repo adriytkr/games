@@ -8,6 +8,7 @@ defineEmits<{
 
 <template>
   <TheScene>
+    <SnakeGrid></SnakeGrid>
     <div class="menu-content">
       <div class="menu-title">Snake Game</div>
       <div class="menu-actions">
@@ -20,6 +21,11 @@ defineEmits<{
 </template>
 
 <style scoped>
+.menu-content{
+  position:relative;
+  z-index:10;
+}
+
 .menu-title{
   margin-bottom:48px;
   font-size:108px;

@@ -5,21 +5,26 @@ export function useSnakeGame(
   canvas:HTMLCanvasElement,
   config:ISnakeGameConfig,
 ):IGameAPI{
-  const INITIAL_SNAKE_POSITION:IVector2[]=[
-    {x:1,y:5},
-    {x:2,y:5},
-    {x:3,y:5},
+  const getMiddleY=()=>Math.floor(config.gridSize.height/2);
+  const getLastX=()=>config.gridSize.width-1;
+
+  const generateSnakeInitialPosition=():IVector2[]=>[
+    {x:1,y:getMiddleY()},
+    {x:2,y:getMiddleY()},
+    {x:3,y:getMiddleY()},
   ];
+
   const INITIAL_APPLE_POSITION:IVector2={
-    x:9,
-    y:5,
+    x:getLastX()-1,
+    y:getMiddleY(),
   };
+
   const INITIAL_SPEED:IVector2={
     x:1,
     y:0,
   };
 
-  let snake:IVector2[]=[...INITIAL_SNAKE_POSITION];
+  let snake:IVector2[]=generateSnakeInitialPosition();
   let apple:IVector2={...INITIAL_APPLE_POSITION};
   let speed:IVector2={...INITIAL_SPEED};
 
@@ -244,7 +249,7 @@ export function useSnakeGame(
   };
 
   const reset=()=>{
-    snake=[...INITIAL_SNAKE_POSITION];
+    snake=generateSnakeInitialPosition();
     apple={...INITIAL_APPLE_POSITION};
     speed={...INITIAL_SPEED}
     begin.value=false;
