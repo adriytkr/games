@@ -33,6 +33,7 @@ const gameConfig=ref<ISnakeGameConfig>({
     <SnakePlayScene
       v-else-if="currentScene==='PLAY'"
       :config="gameConfig"
+      @menu="currentScene='MENU'"
     />
   </div>
 </template>
