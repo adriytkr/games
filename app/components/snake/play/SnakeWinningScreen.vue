@@ -11,8 +11,8 @@ defineEmits<{
       <div class="gameOver">
         <h1 class="status-title">You won</h1>
         <div class="actions">
-          <SnakeButton @click="$emit('play-again')">Play Again</SnakeButton>
-          <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
+          <SnakeBaseButton @click="$emit('play-again')">Play Again</SnakeBaseButton>
+          <SnakeBaseButton @click="$emit('menu')">Menu</SnakeBaseButton>
         </div>
       </div>
     </div>

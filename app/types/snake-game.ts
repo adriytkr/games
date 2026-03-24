@@ -20,7 +20,7 @@ export interface ISnakeGameConfig{
   speed:GameSpeed;
 }
 
-export type Movement=
+export type Direction=
   'up'|
   'left'|
   'down'|

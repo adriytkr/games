@@ -90,8 +90,8 @@ function play(){
         </SnakeSettingsOption>
       </div>
       <div class="settings-actions">
-        <SnakeButton @click="$emit('back')">Back</SnakeButton>
-        <SnakeButton @click="play">Start</SnakeButton>
+        <SnakeBaseButton @click="$emit('back')">Back</SnakeBaseButton>
+        <SnakeBaseButton @click="play">Start</SnakeBaseButton>
       </div>
     </div>
     <SnakeGrid/>

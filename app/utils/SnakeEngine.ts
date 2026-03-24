@@ -73,16 +73,39 @@ export class SnakeEngine{
     }
   }
 
-  public step(velocity:IVector2):void{}
+  public step(velocity:IVector2):void{
+    const newHead=addVec(this.snakeHead,velocity);
 
-  public eatApple(head:IVector2,eatenApple:IVector2):void{
-    this.m_score++;
-    this.snake.push(head);
+    if(checkCollision(newHead,this.snake)!==null){
+      this.onGameOver?.('You self collided');
+      return;
+    }
 
+    if(checkBounds(newHead,this.m_gridSize)){
+      this.onGameOver?.('You hit a wall');
+      return;
+    }
+
+    const totalCells=this.m_gridSize.width*this.m_gridSize.height;
+
+    const eatenApple:IVector2|null=checkCollision(newHead,this.apples);
+    if(eatenApple!==null){
+      this.removeApple(eatenApple);
+      this.m_score++;
+      this.snake.push(newHead);
+      this.spawnApple();
+
+      if(checkWinning(this.snake.length,this.apples.length,totalCells))
+        this.onWin?.();
+    }else{
+      this.snake.push(newHead);
+      this.snake.shift();
+    }
+  }
+
+  public removeApple(eatenApple:IVector2):void{
     const index=this.apples.findIndex(apple=>apple===eatenApple);
     if(index!==-1)this.apples.splice(index,1);
-
-    this.spawnApple();
   };
 
   public spawnApple():void{

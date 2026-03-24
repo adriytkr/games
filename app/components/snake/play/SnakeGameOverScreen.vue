@@ -16,8 +16,8 @@ defineProps<{
         <h1 class="gameOver-title">You lost</h1>
         <p class="gameOver-description">{{ error }}</p>
         <div class="actions">
-          <SnakeButton @click="$emit('retry')">Try Again</SnakeButton>
-          <SnakeButton @click="$emit('menu')">Menu</SnakeButton>
+          <SnakeBaseButton @click="$emit('retry')">Try Again</SnakeBaseButton>
+          <SnakeBaseButton @click="$emit('menu')">Menu</SnakeBaseButton>
         </div>
       </div>
     </div>

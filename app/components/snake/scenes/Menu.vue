@@ -12,9 +12,9 @@ defineEmits<{
     <div class="menu-content">
       <div class="menu-title">Snake Game</div>
       <div class="menu-actions">
-        <SnakeButton @click="$emit('play')">Play</SnakeButton>
-        <SnakeButton @click="$emit('tutorial')">Tutorial</SnakeButton>
-        <SnakeButton @click="$emit('exit')">Exit</SnakeButton>
+        <SnakeBaseButton @click="$emit('play')">Play</SnakeBaseButton>
+        <SnakeBaseButton @click="$emit('tutorial')">Tutorial</SnakeBaseButton>
+        <SnakeBaseButton @click="$emit('exit')">Exit</SnakeBaseButton>
       </div>
     </div>
   </TheScene>

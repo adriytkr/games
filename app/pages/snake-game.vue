@@ -31,22 +31,22 @@ function exit(){
 
 <template>
   <div class="game">
-    <SnakeMenuScene
+    <SnakeScenesMenu
       v-if="currentScene==='MENU'"
       @play="currentScene='SETTINGS'"
       @tutorial="currentScene='TUTORIAL'"
       @exit="exit"
     />
-    <SnakeSettingsScene
+    <SnakeScenesSettings
       v-else-if="currentScene==='SETTINGS'"
       @back="currentScene='MENU'"
       @play="play"
     />
-    <SnakeTutorialScene
+    <SnakeScenesTutorial
       v-else-if="currentScene==='TUTORIAL'"
       @back="currentScene='MENU'"
     />
-    <SnakePlayScene
+    <SnakeScenesPlay
       v-else-if="currentScene==='PLAY'"
       :config="gameConfig"
       @menu="currentScene='MENU'"

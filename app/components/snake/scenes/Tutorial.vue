@@ -12,7 +12,7 @@ defineEmits<{
         <p>Coming soon ;)</p>
       </div>
       <div class="tutorial-actions">
-        <SnakeButton @click="$emit('back')">Back</SnakeButton>
+        <SnakeBaseButton @click="$emit('back')">Back</SnakeBaseButton>
       </div>
     </div>
     <SnakeGrid/>
