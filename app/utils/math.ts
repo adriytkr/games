@@ -24,6 +24,24 @@ export const isPositionOccupied=(pos:IVector2,...targets:IVector2[][]):boolean=>
   return false;
 }
 
+export function getNewFreePosition(gridSize:ISize,...targets:IVector2[][]):IVector2|null{
+  const emptyTiles:IVector2[]=[];
+
+  for(let x=0;x<gridSize.width;x++){
+    for (let y=0;y<gridSize.height;y++){
+      const position:IVector2={x,y};
+      const isOccupied=isPositionOccupied(position,...targets);
+
+      if(!isOccupied)emptyTiles.push({x,y});
+    }
+  }
+
+  if(emptyTiles.length===0)return null;
+
+  const randomIndex=Math.floor(Math.random()*emptyTiles.length);
+  return emptyTiles[randomIndex]!;
+};
+
 export const checkBounds=(pos:IVector2,bounds:ISize):boolean=>
   !isInInterval(0,bounds.width-1,pos.x)||
   !isInInterval(0,bounds.height-1,pos.y);

@@ -8,6 +8,8 @@ export function useSnakeGame(
   const getMiddleY=()=>Math.floor(config.gridSize.height/2);
   const getLastX=()=>config.gridSize.width-1;
 
+  const renderer=new SnakeRenderer(canvas);
+
   const generateInitialSnake=()=>generatePositions(
     {
       x:1,
@@ -17,10 +19,7 @@ export function useSnakeGame(
     3,
   );
 
-  const INITIAL_SPEED:IVector2={
-    x:1,
-    y:0,
-  };
+  const INITIAL_SPEED:IVector2={x:1,y:0};
 
   const generateInitialApples=():IVector2[]=>{
     const defaultApple:IVector2={
@@ -30,7 +29,7 @@ export function useSnakeGame(
     const initialApples:IVector2[]=[defaultApple];
 
     for(let i=0;i<config.appleCount-1;i++){
-      const randomApple=getNewFreePosition();
+      const randomApple=getNewFreePosition(config.gridSize,snake,apples);
       if(randomApple===null)return initialApples;
       initialApples.push(randomApple);
     }
@@ -46,74 +45,6 @@ export function useSnakeGame(
   let begin=ref<boolean>(false);
   const {state:gameState}=useGameState<GameState>('PLAY');
 
-  const getCanvasContext=(canvas:HTMLCanvasElement):CanvasRenderingContext2D=>{
-    const ctx=canvas.getContext('2d');
-
-    if(ctx===null)
-      throw Error('Canvas Context 2D is not available');
-
-    return ctx;
-  }
-
-  const ctx=getCanvasContext(canvas);
-  let cellSize:number;
-
-  const drawCell=(pos:IVector2,color:string)=>{
-    ctx.fillStyle=color;
-    ctx.fillRect(
-      pos.x*cellSize, 
-      pos.y*cellSize, 
-      cellSize-1,
-      cellSize-1,
-    );
-  };
-
-  const drawApple=(apple:IVector2)=>{
-    drawCell(apple,'#ff0000');
-  };
-
-  const drawSnake=(snake:IVector2[])=>{
-    snake.forEach((segment,index)=>{
-      const color=index===snake.length-1
-        ?'#81C784'
-        :'#4CAF50';
-
-      drawCell(segment,color);
-    });
-  };
-
-  const clear=()=>{
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  };
-
-  const drawGrid = () => {
-    ctx.beginPath();
-    ctx.strokeStyle='#1a1a1a';
-    ctx.lineWidth=1;
-
-    for(let x=0;x<=config.gridSize.width;x++){
-      const posX=x*cellSize;
-      ctx.moveTo(posX,0);
-      ctx.lineTo(posX,canvas.height);
-    }
-
-    for(let y=0;y<=config.gridSize.height;y++){
-      const posY=y*cellSize;
-      ctx.moveTo(0,posY);
-      ctx.lineTo(canvas.width,posY);
-    }
-
-    ctx.stroke();
-  };
-
-  const draw=()=>{
-    if(config.showGrid)
-      drawGrid();
-
-    for(const apple of apples)drawApple(apple);
-    drawSnake(snake);
-  };
-
   const updateSnake=(head:IVector2)=>{
     snake.push(head);
     snake.shift();
@@ -122,26 +53,9 @@ export function useSnakeGame(
   const getSnakeHead=():IVector2=>
     snake[snake.length-1]!;
 
-  function getNewFreePosition():IVector2|null{
-    const emptyTiles:IVector2[]=[];
-
-    for(let x=0;x<config.gridSize.width;x++){
-      for (let y=0;y<config.gridSize.height;y++){
-        const position:IVector2={x,y};
-        const isOccupied=isPositionOccupied(position);
-        
-        if(!isOccupied)emptyTiles.push({x,y});
-      }
-    }
-
-    if(emptyTiles.length===0)return null;
-
-    const randomIndex=Math.floor(Math.random()*emptyTiles.length);
-    return emptyTiles[randomIndex]!;
-  };
 
   const spawnApple=()=>{
-    const randomPosition=getNewFreePosition();
+    const randomPosition=getNewFreePosition(config.gridSize,snake,apples);
 
     if(randomPosition===null)
       throw Error('Could not spawn new apple');
@@ -206,15 +120,13 @@ export function useSnakeGame(
     }
     else updateSnake(newHead);
 
-    clear();
-    draw();
+    renderer.render(
+      snake,
+      apples,
+      config.gridSize,
+      config.showGrid,
+    );
   };
-
-  const initCanvas=()=>{
-    canvas.width=canvas.clientWidth;
-    canvas.height=canvas.clientHeight;
-    cellSize=canvas.width/config.gridSize.width;
-  }
 
   const cancelLoop=()=>{
     cancelAnimationFrame(loopId);
@@ -222,10 +134,15 @@ export function useSnakeGame(
 
   let loopId:number;
   const start=()=>{
-    initCanvas();
+    renderer.syncSize(config.gridSize);
     snake=generateInitialSnake();
     apples=generateInitialApples();
-    draw();
+    renderer.render(
+      snake,
+      apples,
+      config.gridSize,
+      config.showGrid,
+    );
 
     loopId=requestAnimationFrame(loop);
   };
@@ -252,11 +169,18 @@ export function useSnakeGame(
     snake=generateInitialSnake();
     apples=generateInitialApples();
     speed={...INITIAL_SPEED};
+
     begin.value=false;
     score.value=0;
     lastDirection='right';
-    clear();
-    draw();
+
+    renderer.render(
+      snake,
+      apples,
+      config.gridSize,
+      config.showGrid,
+    );
+
     gameState.value='PLAY';
     requestAnimationFrame(loop);
   };
